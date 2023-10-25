@@ -17,6 +17,10 @@ public class PropertyMap {
         }
     }
 
+    public Object get(String key) {
+        return currentMap.get(key);
+    }
+
     public void printMap() {
         for (String key : currentMap.keySet()) {
             System.out.println("Key: " + key + " Value: " + currentMap.get(key));
@@ -33,7 +37,7 @@ public class PropertyMap {
                         if (properties.get(key).equals("linked") || !properties.get(key).equals("array")) {
                             currentMap.put(key, defaultMap.get(key));
                         } else {
-                            currentMap.put(key, new ArrayList<>());
+                            currentMap.put(key, value);
                         }
                         break;
                     case "floors":
@@ -73,7 +77,7 @@ public class PropertyMap {
     }
 
     private void setDefaultMap() {
-        defaultMap.put("structures", new LinkedList<>());
+        defaultMap.put("structures", "linked");
         defaultMap.put("floors", 32);
         defaultMap.put("passengers", 0.03);
         defaultMap.put("elevators", 1);

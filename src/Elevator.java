@@ -34,9 +34,11 @@ public class Elevator {
     Elevator (float passengerRatio, String structure, int numFloors) {
         if (structure.equals("linked")) {
             passengers = new LinkedList<>();
+            this.times = new LinkedList<>();
         }
         else {
             passengers = new ArrayList<>();
+            this.times = new ArrayList<>();
         }
         currentFloor = 0;
         this.passengerRatio = passengerRatio;
@@ -44,22 +46,41 @@ public class Elevator {
 
     }
 
-    public List<Integer> travel(int tick) {
-        int nextFloor = currentFloor + 5;
-        List<Integer> times = new ArrayList<>();
+    public void travel(int tick) {
+        newPassenger(tick);
+        if (passengers.isEmpty()) {
+            return;
+        }
+        int nextFloor;
+        if (up) {
+            nextFloor = currentFloor + 5;
+        }
+        else {
+            nextFloor = currentFloor - 5;
+        }
         for (Passenger passenger : passengers) { // Go through the floors the first time
-            if (passenger.destinationFloor == currentFloor) {
+            if (passenger.getDestinationFloor() == currentFloor) {
                 int time = tick - passenger.startTime;
                 times.add(time);
                 passengers.remove(passenger);
-                newPassenger(tick);
+                break;
             }
             else {
-                nextFloor = Math.min(nextFloor, passenger.destinationFloor);
+                if (up) {
+                    nextFloor = Math.min(nextFloor, passenger.getDestinationFloor());
+                }
+                else {
+                    nextFloor = Math.max(nextFloor, passenger.getDestinationFloor());
+                }
+
             }
         }
-        currentFloor = nextFloor;
-        return times;
+        if (up) {
+            currentFloor = Math.min(nextFloor, numFloors);
+        }
+        else {
+            currentFloor = Math.max(1, nextFloor+1);
+        }
     }
 
     public void newPassenger(int startTime) {
@@ -67,13 +88,11 @@ public class Elevator {
         float randomValue = random.nextFloat();
         if (randomValue <= passengerRatio) {
             int randomFloor;
-            if (passengers.isEmpty() || currentFloor == numFloors) { // if we are empty or at the end
+            if (currentFloor == numFloors) { // if we are empty or at the end
                 randomFloor = random.nextInt(1, numFloors);
-                if (randomFloor < currentFloor) {
-                    up = false;
-                }
+                up = false;
             }
-            else if (up) { // if we are at the bottom
+            else if (up) {
                 randomFloor = random.nextInt(currentFloor, numFloors);
             }
             else {
@@ -85,7 +104,7 @@ public class Elevator {
         }
     }
 
-    public int getSmallestTime () {
+    public int getShortestTime () {
         int smallestTime = Integer.MAX_VALUE;
         for (Integer time : times) {
             smallestTime = Math.min(time, smallestTime);
@@ -93,7 +112,7 @@ public class Elevator {
         return smallestTime;
     }
 
-    public int getBiggestTime() {
+    public int getLongestTime() {
         int biggestTime = 0;
         for (Integer time : times) {
             biggestTime = Math.max(biggestTime, time);
@@ -101,17 +120,14 @@ public class Elevator {
         return biggestTime;
     }
 
-    public int averageTime() {
-        int size = times.size();
+    public int getAverageTime() {
+        int size = Math.max(times.size(), 1);
         int sum = 0;
         for (Integer time : times) {
             sum += time;
         }
         return sum / size;
     }
-
-
-
 
 
 }
