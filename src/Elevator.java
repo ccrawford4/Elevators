@@ -83,8 +83,34 @@ public class Elevator {
             Passenger passenger = new Passenger(startTime, randomFloor);
             passengers.add(passenger);
         }
-
     }
+
+    public int getSmallestTime () {
+        int smallestTime = Integer.MAX_VALUE;
+        for (Integer time : times) {
+            smallestTime = Math.min(time, smallestTime);
+        }
+        return smallestTime;
+    }
+
+    public int getBiggestTime() {
+        int biggestTime = 0;
+        for (Integer time : times) {
+            biggestTime = Math.max(biggestTime, time);
+        }
+        return biggestTime;
+    }
+
+    public int averageTime() {
+        int size = times.size();
+        int sum = 0;
+        for (Integer time : times) {
+            sum += time;
+        }
+        return sum / size;
+    }
+
+
 
 
 

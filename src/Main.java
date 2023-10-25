@@ -8,5 +8,6 @@ public class Main {
         }
         PropertyMap propertymap = new PropertyMap(args[0]);
     }
+
 }
 
