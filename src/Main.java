@@ -7,7 +7,6 @@ public class Main {
             return;
         }
         PropertyMap propertymap = new PropertyMap(args[0]);
-        propertymap.printMap();
-
     }
 }
+
