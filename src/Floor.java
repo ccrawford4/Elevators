@@ -18,6 +18,13 @@ public class Floor {
         }
     }
 
+    public Passenger loadPassenger(boolean up) {
+        if (up) {
+            return this.up.remove();
+        }
+        return down.remove();
+    }
+
     boolean containsPassenger(boolean up) {
         if (up) {
             return !this.up.isEmpty();

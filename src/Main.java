@@ -11,7 +11,8 @@ public class Main {
         String structure =  (String) propertymap.get("structures");
         float passengerRatio = (Float) propertymap.get("passengers");
         int numFloors = (Integer) propertymap.get("floors");
-        ElevatorSimulation simulation = new ElevatorSimulation(numElevators, structure, passengerRatio, numFloors);
+        int capacity = (Integer) propertymap.get("elevatorCapacity");
+        ElevatorSimulation simulation = new ElevatorSimulation(numElevators, structure, passengerRatio, numFloors, capacity);
         int duration = (Integer) propertymap.get("duration");
         simulation.runSimulation(duration);
         System.out.println("Shortest Time: " + simulation.getShortestTime());

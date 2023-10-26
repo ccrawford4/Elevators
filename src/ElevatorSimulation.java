@@ -10,6 +10,7 @@ public class ElevatorSimulation {
     private float passengerRatio;
 
     private int numFloors;
+    private int capacity;
     // SIMULATION:
     // --> generate new passenger based on ratio
     // check direction (using getDirection)
@@ -27,9 +28,7 @@ public class ElevatorSimulation {
     // travel()
     // store times
 
-
-
-    ElevatorSimulation(int numElevators, String structure, float passengerRatio, int numFloors) {
+    ElevatorSimulation(int numElevators, String structure, float passengerRatio, int numFloors, int capacity) {
         if (structure.equals("linked")) {
             this.elevators = new LinkedList<>();
             this.floors = new LinkedList<>();
@@ -40,6 +39,7 @@ public class ElevatorSimulation {
         }
         this.passengerRatio = passengerRatio;
         this.numFloors = numFloors;
+        this.capacity = capacity;
         for (int i = 0; i <= numFloors; i++) {
             floors.add(new Floor(structure));
         }
@@ -84,7 +84,12 @@ public class ElevatorSimulation {
                 else {
                     nextFloor = Math.max(passengersOnElevator, passengersWaiting);
                 }
-                elevator.travel(nextFloor, tick);
+                int capacity = elevator.getNumberOfPassengers();
+                while (floors.get(nextFloor).containsPassenger(up) && capacity > 0) {
+                    Passenger passenger = floors.get(nextFloor).loadPassenger(up);
+                    elevator.addPassenger(passenger);
+                }
+                elevator.travel(nextFloor, tick );
             }
         }
     }

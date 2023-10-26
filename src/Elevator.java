@@ -34,6 +34,14 @@ public class Elevator {
         return up;
     }
 
+    public int getNumberOfPassengers() {
+        return passengers.size();
+    }
+
+    public void addPassenger(Passenger passenger) {
+        passengers.add(passenger);
+    }
+
     public void travel(int floor, int time) {
         if (passengers.isEmpty() && up) {
             currentFloor = Math.min(floor + 5, numFloors);
