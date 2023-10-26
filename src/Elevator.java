@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class Elevator {
     private float passengerRatio;
-    boolean up = true;
+    private boolean up = true;
     private int currentFloor;
 
     private List<Passenger> passengers;
@@ -15,23 +15,7 @@ public class Elevator {
     private List<Integer> times;
 
 
-    private class Passenger {
-        private int id;
-        private int startTime;
-        private int destinationFloor;
-        Passenger(int startTime, int destinationFloor) {
-            Random random = new Random(0);
-            id = random.nextInt(0, 100000);
-            this.startTime = startTime;
-            this.destinationFloor = destinationFloor;
-        }
-
-        public int getDestinationFloor() {
-            return destinationFloor;
-        }
-    }
-
-    Elevator (float passengerRatio, String structure, int numFloors) {
+    Elevator (String structure) {
         if (structure.equals("linked")) {
             passengers = new LinkedList<>();
             this.times = new LinkedList<>();
@@ -41,68 +25,46 @@ public class Elevator {
             this.times = new ArrayList<>();
         }
         currentFloor = 0;
-        this.passengerRatio = passengerRatio;
-        this.numFloors = numFloors;
 
     }
+    public int getCurrentFloor () {
+        return currentFloor;
+    }
+    public boolean getDirection () {
+        return up;
+    }
 
-    public void travel(int tick) {
-        newPassenger(tick);
-        if (passengers.isEmpty()) {
-            return;
-        }
-        int nextFloor;
-        if (up) {
-            nextFloor = currentFloor + 5;
-        }
-        else {
-            nextFloor = currentFloor - 5;
-        }
-        for (Passenger passenger : passengers) { // Go through the floors the first time
+    public void travel(int floor, int time) {
+        currentFloor = floor;
+        for (Passenger passenger : passengers) {
             if (passenger.getDestinationFloor() == currentFloor) {
-                int time = tick - passenger.startTime;
-                times.add(time);
+                int timeDiff = time - passenger.getStartTime();
+                times.add(timeDiff);
                 passengers.remove(passenger);
-                break;
-            }
-            else {
-                if (up) {
-                    nextFloor = Math.min(nextFloor, passenger.getDestinationFloor());
-                }
-                else {
-                    nextFloor = Math.max(nextFloor, passenger.getDestinationFloor());
-                }
-
             }
         }
+    }
+
+    public int getNextFloor() {
+        int limit;
         if (up) {
-            currentFloor = Math.min(nextFloor, numFloors);
+            limit = Math.min(currentFloor + 5, numFloors);
         }
         else {
-            currentFloor = Math.max(1, nextFloor+1);
+            limit = Math.max(currentFloor - 5, 1);
         }
-    }
-
-    public void newPassenger(int startTime) {
-        Random random = new Random();
-        float randomValue = random.nextFloat();
-        if (randomValue <= passengerRatio) {
-            int randomFloor;
-            if (currentFloor == numFloors) { // if we are empty or at the end
-                randomFloor = random.nextInt(1, numFloors);
-                up = false;
-            }
-            else if (up) {
-                randomFloor = random.nextInt(currentFloor, numFloors);
+        int nextFloor = limit;
+        for (Passenger passenger : passengers) {
+            if (up) {
+                nextFloor = Math.min(nextFloor, passenger.getDestinationFloor());
             }
             else {
-                randomFloor = random.nextInt(1, currentFloor);
+                nextFloor = Math.max(nextFloor, passenger.getDestinationFloor());
             }
-
-            Passenger passenger = new Passenger(startTime, randomFloor);
-            passengers.add(passenger);
         }
+        return nextFloor;
     }
+
 
     public int getShortestTime () {
         int smallestTime = Integer.MAX_VALUE;
