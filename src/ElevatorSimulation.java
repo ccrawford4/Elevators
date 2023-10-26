@@ -74,9 +74,9 @@ public class ElevatorSimulation {
             for (Elevator elevator : elevators) {
                 boolean up = elevator.getDirection();
                 newPassenger(tick, up);
-                int passengersOnElevator = elevator.getNextFloor();
-                int currentFloor = elevator.getCurrentFloor();
-                int passengersWaiting = getNextFloor(currentFloor, up);
+                int passengersOnElevator = elevator.getNextFloor(numFloors); // 0
+                int currentFloor = elevator.getCurrentFloor(); // 1
+                int passengersWaiting = getNextFloor(currentFloor, up); // waiting on floor 44
                 int nextFloor;
                 if (up) {
                     nextFloor = Math.min(passengersOnElevator, passengersWaiting);
@@ -84,12 +84,12 @@ public class ElevatorSimulation {
                 else {
                     nextFloor = Math.max(passengersOnElevator, passengersWaiting);
                 }
-                int capacity = elevator.getNumberOfPassengers();
-                while (floors.get(nextFloor).containsPassenger(up) && capacity > 0) {
+                int remainingSpace = capacity - elevator.getNumberOfPassengers();
+                while (floors.get(nextFloor).containsPassenger(up) && remainingSpace > 0) {
                     Passenger passenger = floors.get(nextFloor).loadPassenger(up);
                     elevator.addPassenger(passenger);
                 }
-                elevator.travel(nextFloor, tick );
+                elevator.travel(nextFloor, tick, numFloors);
             }
         }
     }

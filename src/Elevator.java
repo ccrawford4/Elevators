@@ -10,7 +10,6 @@ public class Elevator {
     private int currentFloor;
 
     private List<Passenger> passengers;
-    private int numFloors;
 
     private List<Integer> times;
 
@@ -24,7 +23,7 @@ public class Elevator {
             passengers = new ArrayList<>();
             this.times = new ArrayList<>();
         }
-        currentFloor = 0;
+        currentFloor = 1;
 
     }
     public int getCurrentFloor () {
@@ -42,7 +41,7 @@ public class Elevator {
         passengers.add(passenger);
     }
 
-    public void travel(int floor, int time) {
+    public void travel(int floor, int time, int numFloors) {
         if (passengers.isEmpty() && up) {
             currentFloor = Math.min(floor + 5, numFloors);
             return;
@@ -57,11 +56,12 @@ public class Elevator {
                 int timeDiff = time - passenger.getStartTime();
                 times.add(timeDiff);
                 passengers.remove(passenger);
+                return;
             }
         }
     }
 
-    public int getNextFloor() {
+    public int getNextFloor(int numFloors) {
         int limit;
         if (up) {
             limit = Math.min(currentFloor + 5, numFloors);
