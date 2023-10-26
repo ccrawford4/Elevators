@@ -44,7 +44,7 @@ public class ElevatorSimulation {
             floors.add(new Floor(structure));
         }
         for (int i=0; i < numElevators; i++) {
-            Elevator elevator = new Elevator(passengerRatio, structure, numFloors);
+            Elevator elevator = new Elevator(structure);
             this.elevators.add(elevator);
         }
     }
@@ -77,8 +77,14 @@ public class ElevatorSimulation {
                 int passengersOnElevator = elevator.getNextFloor();
                 int currentFloor = elevator.getCurrentFloor();
                 int passengersWaiting = getNextFloor(currentFloor, up);
-
-                elevator.travel(tick);
+                int nextFloor;
+                if (up) {
+                    nextFloor = Math.min(passengersOnElevator, passengersWaiting);
+                }
+                else {
+                    nextFloor = Math.max(passengersOnElevator, passengersWaiting);
+                }
+                elevator.travel(nextFloor, tick);
             }
         }
     }
