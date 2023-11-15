@@ -1,111 +1,109 @@
 package src;
-import java.util.Random;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.ArrayList;
+import java.util.*;
 
 public class Elevator {
-    private float passengerRatio;
-    private boolean up = true;
+    private boolean up;
+    private int capacity;
     private int currentFloor;
+    PriorityQueue<Passenger> goingUp;
+    PriorityQueue<Passenger> goingDown;
+    PriorityQueue<Integer> requestedFloorsUp;
+    PriorityQueue<Integer> requestedFloorsDown;
+    ElevatorSimulation simulation;
 
-    private List<Passenger> passengers;
 
-    private List<Integer> times;
-
-
-    Elevator (String structure) {
-        if (structure.equals("linked")) {
-            passengers = new LinkedList<>();
-            this.times = new LinkedList<>();
-        }
-        else {
-            passengers = new ArrayList<>();
-            this.times = new ArrayList<>();
-        }
-        currentFloor = 1;
-
+    Elevator (ElevatorSimulation simulation, int capacity) {
+        this.goingUp = new PriorityQueue<>(); // Min Heap
+        this.goingDown = new PriorityQueue<>(Comparator.reverseOrder()); // Max heap
+        this.requestedFloorsUp = new PriorityQueue<>(); // Min Heap
+        this.requestedFloorsDown = new PriorityQueue<>(Comparator.reverseOrder()); // Max Heap
+        this.capacity = capacity;
+        this.up = true;
+        this.simulation = simulation;
     }
     public int getCurrentFloor () {
         return currentFloor;
     }
-    public boolean getDirection () {
+    public boolean goingUp () {
         return up;
     }
 
-    public int getNumberOfPassengers() {
-        return passengers.size();
+    public boolean full() {
+        return (goingUp.size() + goingDown.size()) < capacity;
     }
-
-    public void addPassenger(Passenger passenger) {
-        passengers.add(passenger);
-    }
-
-    public void travel(int floor, int time, int numFloors) {
-        if (passengers.isEmpty() && up) {
-            currentFloor = Math.min(floor + 5, numFloors);
-            return;
-        }
-        if (passengers.isEmpty()) {
-            currentFloor = Math.max(floor - 5, 1);
-            return;
-        }
-        currentFloor = floor;
-        for (Passenger passenger : passengers) {
-            if (passenger.getDestinationFloor() == currentFloor) {
-                int timeDiff = time - passenger.getStartTime();
-                times.add(timeDiff);
-                passengers.remove(passenger);
-                return;
-            }
-        }
-    }
-
-    public int getNextFloor(int numFloors) {
-        int limit;
-        if (up) {
-            limit = Math.min(currentFloor + 5, numFloors);
-        }
-        else {
-            limit = Math.max(currentFloor - 5, 1);
-        }
-        int nextFloor = limit;
-        for (Passenger passenger : passengers) {
-            if (up) {
-                nextFloor = Math.min(nextFloor, passenger.getDestinationFloor());
+   public void load(Queue<Passenger> peopleWaiting) {
+        while (!peopleWaiting.isEmpty() && goingUp.size() + goingDown.size() < capacity) {
+            if (peopleWaiting.peek().getDestinationFloor() < currentFloor) {
+                goingDown.add(peopleWaiting.remove());
             }
             else {
-                nextFloor = Math.max(nextFloor, passenger.getDestinationFloor());
+                goingUp.add(peopleWaiting.remove());
             }
         }
-        return nextFloor;
-    }
+   }
 
-
-    public int getShortestTime () {
-        int smallestTime = Integer.MAX_VALUE;
-        for (Integer time : times) {
-            smallestTime = Math.min(time, smallestTime);
+   public boolean requestToGetOff() {
+        if (!goingUp.isEmpty() && goingUp.peek().getDestinationFloor() == currentFloor) {
+            return true;
         }
-        return smallestTime;
-    }
+       return !goingDown.isEmpty() && goingDown.peek().getDestinationFloor() == currentFloor;
+   }
 
-    public int getLongestTime() {
-        int biggestTime = 0;
-        for (Integer time : times) {
-            biggestTime = Math.max(biggestTime, time);
+   public void unload(int currentTime) {
+        while (!goingUp.isEmpty() && goingUp.peek().getDestinationFloor() == currentFloor) {
+            Passenger passenger = goingUp.peek();
+            simulation.getReport(currentTime - passenger.getStartTime());
         }
-        return biggestTime;
-    }
-
-    public int getAverageTime() {
-        int size = Math.max(times.size(), 1);
-        int sum = 0;
-        for (Integer time : times) {
-            sum += time;
+        while (!goingDown.isEmpty() && goingDown.peek().getDestinationFloor() == currentFloor) {
+            goingDown.remove();
         }
-        return sum / size;
-    }
+   }
 
+   public void requestStop(int requestedFloor) {
+        if (goingUp.isEmpty() && goingDown.isEmpty()) {
+            up = requestedFloor > currentFloor;
+        }
+        if (currentFloor < requestedFloor) {
+            requestedFloorsUp.add(requestedFloor);
+        }
+        else {
+            requestedFloorsDown.add(requestedFloor);
+        }
+
+   }
+
+   public void printInfo() {
+       System.out.println("------------------------------------------");
+       System.out.println("Current Floor: " + currentFloor);
+       System.out.println("Going up passengers: " + goingUp.size());
+       System.out.println("Going down passenger: " + goingDown.size());
+       System.out.println("Requested up passengers: " + requestedFloorsUp.size());
+       System.out.println("Requested down passengers: " + requestedFloorsDown.size());
+       System.out.println("-------------------------------------------");
+
+
+   }
+
+   private int findOnBoardRequest(PriorityQueue<Passenger> onBoardQueue, boolean up) {
+        int nextFloor = (up) ? currentFloor + 5 : currentFloor - 5;
+        return (!onBoardQueue.isEmpty()) ? onBoardQueue.peek().getDestinationFloor() : Integer.MAX_VALUE;
+   }
+   private int findOffBoardRequest(PriorityQueue<Integer> offBoardQueue) {
+        return (!offBoardQueue.isEmpty()) ? offBoardQueue.peek() : Integer.MAX_VALUE;
+   }
+
+    public void travel() {
+        System.out.println("Current Floor before: " + currentFloor);
+        int maxFloor = currentFloor + 5;
+        int minFloor = currentFloor - 5;
+
+        int onBoardRequest = (up) ? findOnBoardRequest(goingUp, up) : findOnBoardRequest(goingDown, up);
+        int offBoardRequest = (up) ? findOffBoardRequest(requestedFloorsUp) : findOffBoardRequest(requestedFloorsDown);
+        int priorityRequest = (up) ? Math.min(onBoardRequest, offBoardRequest) : Math.max(onBoardRequest, offBoardRequest);
+
+        currentFloor = (up) ? Math.min(maxFloor, priorityRequest) : Math.max(minFloor, priorityRequest);
+
+        System.out.println("Current Floor After: " + currentFloor);
+    }
 
 }

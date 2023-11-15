@@ -7,7 +7,10 @@ public class Floor {
     private Queue<Passenger> up;
     private Queue<Passenger> down;
 
-    Floor(String structure) {
+    private final int floorNumber;
+
+    Floor(String structure, int floorNumber) {
+        this.floorNumber = floorNumber;
         if (structure.equals("linked")) {
             up = new LinkedList<>();
             down = new LinkedList<>();
@@ -18,27 +21,32 @@ public class Floor {
         }
     }
 
-    public Passenger loadPassenger(boolean up) {
-        if (up) {
-            return this.up.remove();
-        }
-        return down.remove();
+    public Queue<Passenger> upQueue() {
+        return up;
     }
 
-    boolean containsPassenger(boolean up) {
-        if (up) {
-            return !this.up.isEmpty();
-        }
+    public Queue<Passenger> downQueue() {
+        return down;
+    }
+
+    public boolean goingUp() {
+        return !up.isEmpty();
+    }
+
+    public boolean goingDown() {
         return !down.isEmpty();
     }
 
-    public void newPassenger(Passenger passenger, boolean up) {
-        if (up) {
-            this.up.add(passenger);
+    public void generatePassenger(int startTime, int destinationFloor) {
+        if (destinationFloor > floorNumber) {
+            up.add(new Passenger(startTime, destinationFloor));
         }
         else {
-            down.add(passenger);
+            down.add(new Passenger(startTime, destinationFloor));
         }
     }
+
+
+
 
 }

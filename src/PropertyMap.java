@@ -27,7 +27,6 @@ public class PropertyMap {
         }
     }
 
-
     private void mapItems (Properties properties) {
         for (String key : properties.stringPropertyNames()) {
             try {

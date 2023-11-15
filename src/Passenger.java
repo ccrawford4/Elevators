@@ -2,19 +2,21 @@ package src;
 
 import java.util.Random;
 
-public class Passenger {
-    private int id;
-    private int startTime;
-    private int destinationFloor;
+public class Passenger implements Comparable<Passenger>{
+    private final int startTime;
+    private final int destinationFloor;
     Passenger(int startTime, int destinationFloor) {
-        Random random = new Random(0);
-        id = random.nextInt(0, 100000);
         this.startTime = startTime;
         this.destinationFloor = destinationFloor;
     }
 
     public int getStartTime() {
         return startTime;
+    }
+
+    @Override
+    public int compareTo(Passenger other) {
+        return Integer.compare(this.destinationFloor, other.destinationFloor);
     }
 
     public int getDestinationFloor() {

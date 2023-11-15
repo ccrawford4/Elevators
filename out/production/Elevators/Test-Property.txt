@@ -1,6 +1,6 @@
 structures=array
 floors=64
 passengers=0.9
-elevators=2
-elevatorCapacity=9
+elevators=1
+elevatorCapacity=15
 duration=450
