@@ -3,7 +3,7 @@ package src;
 import java.io.FileReader;
 import java.util.*;
 public class PropertyMap {
-    private Map<String, Object> defaultMap = new HashMap<>();
+    private final Map<String, Object> defaultMap = new HashMap<>();
     private Map<String, Object> currentMap = new HashMap<>();
 
     PropertyMap (String fileName) {
@@ -32,37 +32,34 @@ public class PropertyMap {
             try {
                 String value = String.valueOf(properties.get(key));
                 switch (key) {
-                    case "structures":
+                    case "structures" -> {
                         if (properties.get(key).equals("linked") || !properties.get(key).equals("array")) {
                             currentMap.put(key, defaultMap.get(key));
                         } else {
                             currentMap.put(key, value);
                         }
-                        break;
-                    case "floors":
+                    }
+                    case "floors" -> {
                         if (Integer.parseInt(value) < 2) {
                             currentMap.put(key, defaultMap.get(key));
                         } else {
                             currentMap.put(key, Integer.parseInt(value));
                         }
-                        break;
-                    case "passengers":
+                    }
+                    case "passengers" -> {
                         if (Float.parseFloat(value) <= 0 || Float.parseFloat(value) >= 1.0) {
                             currentMap.put(key, defaultMap.get(key));
                         } else {
                             currentMap.put(key, Float.parseFloat(value));
                         }
-                        break;
-                    case "elevators":
-                    case "elevatorCapacity":
-                    case "duration":
+                    }
+                    case "elevators", "elevatorCapacity", "duration" -> {
                         if (Integer.parseInt(value) < 1) {
                             currentMap.put(key, defaultMap.get(key));
-                        }
-                        else {
+                        } else {
                             currentMap.put(key, Integer.parseInt(value));
                         }
-                        break;
+                    }
                 }
             } catch (Exception e) {
                 currentMap.put(key, defaultMap.get(key));

@@ -48,7 +48,7 @@ public class ElevatorSimulation {
                 closestElevator.requestStop(startFloor);
             }
             for (Elevator elevator : elevators) {
-                elevator.printInfo();
+                //elevator.printInfo();
                 int currentFloor = elevator.getCurrentFloor();
                 Queue<Passenger> floorQueue = floors.get(currentFloor).upQueue();
                 elevator.travel(tick, floorQueue);
