@@ -11,8 +11,10 @@ public class Elevator {
     PriorityQueue<Integer> requestedFloorsDown;
     ElevatorSimulation simulation;
 
+    int numFloors;
 
-    Elevator (ElevatorSimulation simulation, int capacity) {
+
+    Elevator (ElevatorSimulation simulation, int capacity, int numFloors) {
         this.goingUp = new PriorityQueue<>(); // Min Heap
         this.goingDown = new PriorityQueue<>(Comparator.reverseOrder()); // Max heap
         this.requestedFloorsUp = new PriorityQueue<>(); // Min Heap
@@ -20,6 +22,7 @@ public class Elevator {
         this.capacity = capacity;
         this.up = true;
         this.simulation = simulation;
+        this.numFloors = numFloors;
     }
     public int getCurrentFloor () {
         return currentFloor;
@@ -87,7 +90,10 @@ public class Elevator {
 
     public void travel(int tick, Queue<Passenger> people) {
         unload(tick);
-        int nextFloor = currentFloor + 5;
+        if (requestedFloorsUp.isEmpty() && goingUp.isEmpty()) {
+            return;
+        }
+        int nextFloor = Math.min(currentFloor + 5, numFloors-1);
         int requestedFloor = requestedFloorsUp.isEmpty() ? nextFloor : requestedFloorsUp.peek();
         if (currentFloor == requestedFloor) {
             load(people);

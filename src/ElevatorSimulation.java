@@ -25,7 +25,7 @@ public class ElevatorSimulation {
             floors.add(new Floor(structure, i));
         }
         for (int i=0; i < numElevators; i++) {
-            Elevator elevator = new Elevator(this, capacity);
+            Elevator elevator = new Elevator(this, capacity, numFloors);
             this.elevators.add(elevator);
         }
     }
@@ -50,8 +50,17 @@ public class ElevatorSimulation {
             for (Elevator elevator : elevators) {
                 //elevator.printInfo();
                 int currentFloor = elevator.getCurrentFloor();
+                System.out.println("Before -----------------------");
+                System.out.println("Elevator current floor: " + elevator.getCurrentFloor());
+                System.out.println("Elevator requests up before: " + elevator.requestedFloorsUp.size());
                 Queue<Passenger> floorQueue = floors.get(currentFloor).upQueue();
+                System.out.println("Current Floor Queue: " + floorQueue.size());
                 elevator.travel(tick, floorQueue);
+                System.out.println("After ---------------------");
+                System.out.println("Elevator current floor: " + elevator.getCurrentFloor());
+                System.out.println("Elevator requests up after: " + elevator.requestedFloorsUp.size());
+                System.out.println("Floor queue after: " + floorQueue.size());
+
             }
         }
    }
@@ -85,6 +94,9 @@ public class ElevatorSimulation {
     }
 
     public int getShortestTime() {
+        if (minTime == Integer.MAX_VALUE) {
+            return 0;
+        }
         return minTime;
     }
 
@@ -96,6 +108,9 @@ public class ElevatorSimulation {
         int sum = 0;
         for (Integer time : times) {
             sum += time;
+        }
+        if (times.size() == 0) {
+            return 0;
         }
         return sum / times.size();
     }
