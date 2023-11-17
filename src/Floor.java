@@ -46,6 +46,14 @@ public class Floor {
         }
     }
 
+   /* public void removePassengers(boolean up, int numToRemove) {
+        if (up) {
+            for (int i = 0; i < numToRemove; i++) {
+                this.up.remove();
+            }
+        }
+    }*/
+
 
 
 

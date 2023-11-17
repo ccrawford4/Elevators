@@ -1,8 +1,5 @@
 package src;
-import java.util.LinkedList;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class ElevatorSimulation {
     private List<Elevator> elevators;
@@ -51,18 +48,10 @@ public class ElevatorSimulation {
                 closestElevator.requestStop(startFloor);
             }
             for (Elevator elevator : elevators) {
-                //elevator.printInfo();
-                if (elevator.requestToGetOff()) {
-                    elevator.unload(tick);
-                }
-                if (floors.get(elevator.getCurrentFloor()).goingUp()) {
-                    elevator.load(floors.get(elevator.getCurrentFloor()).upQueue());
-
-                }
-                else if (floors.get(elevator.getCurrentFloor()).goingDown()) {
-                    elevator.load(floors.get(elevator.getCurrentFloor()).downQueue());
-                }
-                elevator.travel();
+                elevator.printInfo();
+                int currentFloor = elevator.getCurrentFloor();
+                Queue<Passenger> floorQueue = floors.get(currentFloor).upQueue();
+                elevator.travel(tick, floorQueue);
             }
         }
    }

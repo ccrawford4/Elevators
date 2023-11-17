@@ -35,9 +35,11 @@ public class Elevator {
         while (!peopleWaiting.isEmpty() && goingUp.size() + goingDown.size() < capacity) {
             if (peopleWaiting.peek().getDestinationFloor() < currentFloor) {
                 goingDown.add(peopleWaiting.remove());
+                requestedFloorsDown.remove();
             }
             else {
                 goingUp.add(peopleWaiting.remove());
+                requestedFloorsUp.remove();
             }
         }
    }
@@ -53,6 +55,7 @@ public class Elevator {
         while (!goingUp.isEmpty() && goingUp.peek().getDestinationFloor() == currentFloor) {
             Passenger passenger = goingUp.peek();
             simulation.getReport(currentTime - passenger.getStartTime());
+            goingUp.remove();
         }
         while (!goingDown.isEmpty() && goingDown.peek().getDestinationFloor() == currentFloor) {
             goingDown.remove();
@@ -80,30 +83,19 @@ public class Elevator {
        System.out.println("Requested up passengers: " + requestedFloorsUp.size());
        System.out.println("Requested down passengers: " + requestedFloorsDown.size());
        System.out.println("-------------------------------------------");
-
-
    }
 
-   private int findOnBoardRequest(PriorityQueue<Passenger> onBoardQueue, boolean up) {
-        int nextFloor = (up) ? currentFloor + 5 : currentFloor - 5;
-        return (!onBoardQueue.isEmpty()) ? onBoardQueue.peek().getDestinationFloor() : Integer.MAX_VALUE;
-   }
-   private int findOffBoardRequest(PriorityQueue<Integer> offBoardQueue) {
-        return (!offBoardQueue.isEmpty()) ? offBoardQueue.peek() : Integer.MAX_VALUE;
-   }
+    public void travel(int tick, Queue<Passenger> people) {
+        unload(tick);
+        int nextFloor = currentFloor + 5;
+        int requestedFloor = requestedFloorsUp.isEmpty() ? nextFloor : requestedFloorsUp.peek();
+        if (currentFloor == requestedFloor) {
+            load(people);
+        }
+        int currentPassenger = goingUp.isEmpty() ? nextFloor : goingUp.peek().getDestinationFloor();
+        int priorityRequest = Math.min(requestedFloor, currentPassenger);
+        currentFloor = Math.min(nextFloor, priorityRequest);
 
-    public void travel() {
-        System.out.println("Current Floor before: " + currentFloor);
-        int maxFloor = currentFloor + 5;
-        int minFloor = currentFloor - 5;
-
-        int onBoardRequest = (up) ? findOnBoardRequest(goingUp, up) : findOnBoardRequest(goingDown, up);
-        int offBoardRequest = (up) ? findOffBoardRequest(requestedFloorsUp) : findOffBoardRequest(requestedFloorsDown);
-        int priorityRequest = (up) ? Math.min(onBoardRequest, offBoardRequest) : Math.max(onBoardRequest, offBoardRequest);
-
-        currentFloor = (up) ? Math.min(maxFloor, priorityRequest) : Math.max(minFloor, priorityRequest);
-
-        System.out.println("Current Floor After: " + currentFloor);
     }
 
 }

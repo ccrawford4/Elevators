@@ -1,5 +1,5 @@
 structures=array
-floors=64
+floors=30
 passengers=0.9
 elevators=1
 elevatorCapacity=15
