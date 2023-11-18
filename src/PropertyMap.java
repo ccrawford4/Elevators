@@ -1,11 +1,14 @@
 package src;
-
 import java.io.FileReader;
 import java.util.*;
 public class PropertyMap {
     private final Map<String, Object> defaultMap = new HashMap<>();
     private Map<String, Object> currentMap = new HashMap<>();
 
+    /**
+     * Constructor for the PropertyMap class
+     * @param fileName - File Name as a String
+     */
     PropertyMap (String fileName) {
         setDefaultMap();
         Properties properties = parseFile(fileName);
@@ -16,10 +19,22 @@ public class PropertyMap {
             mapItems(properties);
         }
     }
+
+    /**
+     * Returns the value associated with a given key in the PropertyMap
+     * @param key - Key for the PropertyMap passed as a string
+     * @return - Returns the value in the property map associated with the given key
+     */
     public Object get(String key) {
         return currentMap.get(key);
     }
 
+    /**
+     * Takes in the properties as a parameter and checks to see if the values are valid.
+     * Stores the correct key-value pairs in a HashMap
+     *
+     * @param properties - Properties parsed from a file
+     */
     private void mapItems (Properties properties) {
         for (String key : properties.stringPropertyNames()) {
             try {
@@ -65,6 +80,9 @@ public class PropertyMap {
         }
     }
 
+    /**
+     * Establishes the default map for cases of incorrect/missing values in property.txt file
+     */
     private void setDefaultMap() {
         defaultMap.put("structures", "linked");
         defaultMap.put("floors", 32);
@@ -74,6 +92,12 @@ public class PropertyMap {
         defaultMap.put("duration", 500);
     }
 
+    /**
+     * Returns the Properties provided after parsing a file
+     *
+     * @param fileName - File name as a string
+     * @return - Returns the Properties class loaded with the file data
+     */
     public Properties parseFile(String fileName) {
         Properties properties = new Properties();
         try {
