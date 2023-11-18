@@ -12,6 +12,13 @@ public class Elevator {
     ElevatorSimulation simulation;
     int numFloors;
 
+    /**
+     * Elevator class constructor
+     *
+     * @param simulation - Simulation class to be referenced
+     * @param capacity - Elevator Capacity
+     * @param numFloors - Number of floors
+     */
     Elevator (ElevatorSimulation simulation, int capacity, int numFloors) {
         this.goingUp = new PriorityQueue<>(); // Min Heap
         this.goingDown = new PriorityQueue<>(Comparator.reverseOrder()); // Max heap
@@ -22,13 +29,26 @@ public class Elevator {
         this.simulation = simulation;
         this.numFloors = numFloors;
     }
+
+    /**
+     *
+     * @return - # of floors
+     */
     public int getCurrentFloor () {
         return currentFloor;
     }
+
+    /**
+     *
+     * @return - boolean if the elevator is going up
+     */
     public boolean goingUp () {
         return up;
     }
 
+    /**
+     * Loads the requested passengers onto the elevator
+     */
    public void load() {
         if (up) {
             while (!requestedFloorsUp.isEmpty() && requestedFloorsUp.peek().getStartFloor() == currentFloor && goingUp.size() + goingDown.size() < capacity) {
@@ -42,6 +62,11 @@ public class Elevator {
         }
    }
 
+    /**
+     * Removes the passengers from the elevator
+     *
+     * @param currentTime - Current time for calculation’s sake
+     */
    public void unload(int currentTime) {
         while (!goingUp.isEmpty() && goingUp.peek().getDestinationFloor() == currentFloor) {
             Passenger passenger = goingUp.peek();
@@ -59,6 +84,11 @@ public class Elevator {
         }
    }
 
+    /**
+     * Requests a stop
+     *
+     * @param passenger - Takes in the passenger that's waiting
+     */
    public void requestStop(Passenger passenger) {
         if (currentFloor < passenger.getStartFloor()) {
             requestedFloorsUp.add(passenger);
@@ -68,6 +98,9 @@ public class Elevator {
         }
    }
 
+    /**
+     * Prints elevator info - helpful for debugging
+     */
    public void printInfo() {
        System.out.println("------------------------------------------");
        System.out.println("Current Floor: " + currentFloor);
@@ -78,6 +111,11 @@ public class Elevator {
        System.out.println("-------------------------------------------");
    }
 
+    /**
+     * Travel method to control where the elevator goes to next.
+     *
+     * @param tick - The current time
+     */
     public void travel(int tick) {
         if (currentFloor == numFloors-1 || goingUp.isEmpty() && requestedFloorsUp.isEmpty()) {
             up = false;
@@ -91,7 +129,6 @@ public class Elevator {
         if (!goingDown.isEmpty() && goingDown.peek().getDestinationFloor() == currentFloor) {
             unload(tick);
         }
-
 
         int nextFloor;
         int requestedFloor;

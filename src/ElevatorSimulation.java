@@ -9,6 +9,15 @@ public class ElevatorSimulation {
     private int maxTime = 0;
     private int minTime = Integer.MAX_VALUE;
 
+    /**
+     * ElevatorSimulation constructor
+     *
+     * @param numElevators - Number of elevators to be created
+     * @param structure - Type of structure
+     * @param passengerRatio - Passenger ratio
+     * @param numFloors - Number of floors
+     * @param capacity - Elevator capacity
+     */
     ElevatorSimulation(int numElevators, String structure, float passengerRatio, int numFloors, int capacity) {
         if (structure.equals("linked")) {
             this.elevators = new LinkedList<>();
@@ -26,14 +35,31 @@ public class ElevatorSimulation {
         }
     }
 
+    /**
+     * Returns a random floor using the number of floors as a constraint
+     *
+     * @return - The random floor as an integer
+     */
     public int randomFloor() {
         Random random = new Random();
         return random.nextInt(1, numFloors);
     }
+
+    /**
+     * Generates a random float to be returned
+     *
+     * @return
+     */
     public float randomFloat() {
         Random random = new Random();
         return random.nextFloat(0, 1);
     }
+
+    /**
+     * Runs the simulation
+     *
+     * @param ticks Takes in the duration
+     */
    public void runSimulation(int ticks) {
         for (int tick = 0; tick < ticks; tick++) {
             if (randomFloat() < passengerRatio) {
@@ -49,6 +75,13 @@ public class ElevatorSimulation {
         }
    }
 
+    /**
+     * Finds the most ideal elevator to take requests for a passenger
+     *
+     * @param startFloor - Start floor
+     *
+     * @return - Returns the ideal elevator
+     */
    public Elevator findBestElevator(int startFloor) {
         Elevator bestElevator = elevators.get(0);
         int minDistance = Math.abs(bestElevator.getCurrentFloor() - startFloor);
@@ -68,12 +101,21 @@ public class ElevatorSimulation {
         return bestElevator;
    }
 
+    /**
+     * Takes in a time (calculated by the current time - the passenger start time)
+     * and updates the times list.
+     *
+     * @param time - Returns the time
+     */
     public void getReport(int time) {
         minTime = Math.min(time, minTime);
         maxTime = Math.max(time, maxTime);
         times.add(time);
     }
 
+    /**
+     * @return - Returns the shortest time in the list
+     */
     public int getShortestTime() {
         if (minTime == Integer.MAX_VALUE) {
             return 0;
@@ -81,9 +123,18 @@ public class ElevatorSimulation {
         return minTime;
     }
 
+    /**
+     *
+     * @return - Returns the longest time
+     */
     public int getLongestTime() {
         return maxTime;
     }
+
+    /**
+     *
+     * @return - Returns the average time
+     */
     public int getAverageTime() {
         int sum = 0;
         for (Integer time : times) {
