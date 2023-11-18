@@ -16,15 +16,8 @@ public class PropertyMap {
             mapItems(properties);
         }
     }
-
     public Object get(String key) {
         return currentMap.get(key);
-    }
-
-    public void printMap() {
-        for (String key : currentMap.keySet()) {
-            System.out.println("Key: " + key + " Value: " + currentMap.get(key));
-        }
     }
 
     private void mapItems (Properties properties) {

@@ -5,14 +5,12 @@ public class Elevator {
     private boolean up;
     private int capacity;
     private int currentFloor;
-    PriorityQueue<Passenger> goingUp;
-    PriorityQueue<Passenger> goingDown;
-    PriorityQueue<Integer> requestedFloorsUp;
-    PriorityQueue<Integer> requestedFloorsDown;
+    private PriorityQueue<Passenger> goingUp;
+    private  PriorityQueue<Passenger> goingDown;
+    private PriorityQueue<Passenger> requestedFloorsUp;
+    private PriorityQueue<Passenger> requestedFloorsDown;
     ElevatorSimulation simulation;
-
     int numFloors;
-
 
     Elevator (ElevatorSimulation simulation, int capacity, int numFloors) {
         this.goingUp = new PriorityQueue<>(); // Min Heap
@@ -31,51 +29,43 @@ public class Elevator {
         return up;
     }
 
-    public boolean full() {
-        return (goingUp.size() + goingDown.size()) < capacity;
-    }
-   public void load(Queue<Passenger> peopleWaiting) {
-        while (!peopleWaiting.isEmpty() && goingUp.size() + goingDown.size() < capacity) {
-            if (peopleWaiting.peek().getDestinationFloor() < currentFloor) {
-                goingDown.add(peopleWaiting.remove());
-                requestedFloorsDown.remove();
-            }
-            else {
-                goingUp.add(peopleWaiting.remove());
-                requestedFloorsUp.remove();
+   public void load() {
+        if (up) {
+            while (!requestedFloorsUp.isEmpty() && requestedFloorsUp.peek().getStartFloor() == currentFloor && goingUp.size() + goingDown.size() < capacity) {
+                goingUp.add(requestedFloorsUp.remove());
             }
         }
-   }
-
-   public boolean requestToGetOff() {
-        if (!goingUp.isEmpty() && goingUp.peek().getDestinationFloor() == currentFloor) {
-            return true;
+        else {
+            while (!requestedFloorsDown.isEmpty() && requestedFloorsDown.peek().getStartFloor() == currentFloor & goingUp.size() + goingDown.size() < capacity) {
+                goingDown.add(requestedFloorsDown.remove());
+            }
         }
-       return !goingDown.isEmpty() && goingDown.peek().getDestinationFloor() == currentFloor;
    }
 
    public void unload(int currentTime) {
         while (!goingUp.isEmpty() && goingUp.peek().getDestinationFloor() == currentFloor) {
             Passenger passenger = goingUp.peek();
-            simulation.getReport(currentTime - passenger.getStartTime());
+            if (passenger != null) {
+                simulation.getReport(currentTime - passenger.getStartTime());
+            }
             goingUp.remove();
         }
         while (!goingDown.isEmpty() && goingDown.peek().getDestinationFloor() == currentFloor) {
+            Passenger passenger = goingUp.peek();
+            if (passenger != null) {
+                simulation.getReport(currentTime - passenger.getStartTime());
+            }
             goingDown.remove();
         }
    }
 
-   public void requestStop(int requestedFloor) {
-        if (goingUp.isEmpty() && goingDown.isEmpty()) {
-            up = requestedFloor > currentFloor;
-        }
-        if (currentFloor < requestedFloor) {
-            requestedFloorsUp.add(requestedFloor);
+   public void requestStop(Passenger passenger) {
+        if (currentFloor < passenger.getStartFloor()) {
+            requestedFloorsUp.add(passenger);
         }
         else {
-            requestedFloorsDown.add(requestedFloor);
+            requestedFloorsDown.add(passenger);
         }
-
    }
 
    public void printInfo() {
@@ -88,20 +78,43 @@ public class Elevator {
        System.out.println("-------------------------------------------");
    }
 
-    public void travel(int tick, Queue<Passenger> people) {
-        unload(tick);
-        if (requestedFloorsUp.isEmpty() && goingUp.isEmpty()) {
-            return;
+    public void travel(int tick) {
+        if (currentFloor == numFloors-1 || goingUp.isEmpty() && requestedFloorsUp.isEmpty()) {
+            up = false;
         }
-        int nextFloor = Math.min(currentFloor + 5, numFloors-1);
-        int requestedFloor = requestedFloorsUp.isEmpty() ? nextFloor : requestedFloorsUp.peek();
-        if (currentFloor == requestedFloor) {
-            load(people);
+        if (currentFloor <= 1 || goingDown.isEmpty() && requestedFloorsDown.isEmpty()) {
+            up = true;
         }
-        int currentPassenger = goingUp.isEmpty() ? nextFloor : goingUp.peek().getDestinationFloor();
-        int priorityRequest = Math.min(requestedFloor, currentPassenger);
-        currentFloor = Math.min(nextFloor, priorityRequest);
+        if (!goingUp.isEmpty() && goingUp.peek().getDestinationFloor() == currentFloor) {
+            unload(tick);
+        }
+        if (!goingDown.isEmpty() && goingDown.peek().getDestinationFloor() == currentFloor) {
+            unload(tick);
+        }
 
+
+        int nextFloor;
+        int requestedFloor;
+        int currentPassenger;
+        int priorityRequest;
+
+        if (up) {
+            nextFloor = Math.min(currentFloor + 5, numFloors - 1);
+            requestedFloor = requestedFloorsUp.isEmpty() ? nextFloor : requestedFloorsUp.peek().getStartFloor();
+            currentPassenger = goingUp.isEmpty() ? nextFloor : goingUp.peek().getDestinationFloor();
+            priorityRequest = Math.min(requestedFloor, currentPassenger);
+            currentFloor = Math.min(nextFloor, priorityRequest);
+        }
+        else {
+            nextFloor = Math.max(currentFloor - 5, 0);
+            requestedFloor = requestedFloorsDown.isEmpty() ? nextFloor : requestedFloorsDown.peek().getStartFloor();
+            currentPassenger = goingDown.isEmpty() ? nextFloor : goingDown.peek().getDestinationFloor();
+            priorityRequest = Math.max(requestedFloor, currentPassenger);
+            currentFloor = Math.max(nextFloor, priorityRequest);
+        }
+        if (currentFloor == requestedFloor) {
+            load();
+        }
     }
 
 }

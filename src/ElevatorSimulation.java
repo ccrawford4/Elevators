@@ -2,9 +2,9 @@ package src;
 import java.util.*;
 
 public class ElevatorSimulation {
-    private List<Elevator> elevators;
-    private List<Floor> floors;
-    private float passengerRatio;
+    private final List<Elevator> elevators;
+    private final int numFloors;
+    private final float passengerRatio;
     List<Integer> times;
     private int maxTime = 0;
     private int minTime = Integer.MAX_VALUE;
@@ -12,18 +12,14 @@ public class ElevatorSimulation {
     ElevatorSimulation(int numElevators, String structure, float passengerRatio, int numFloors, int capacity) {
         if (structure.equals("linked")) {
             this.elevators = new LinkedList<>();
-            this.floors = new LinkedList<>();
             this.times = new LinkedList<>();
         }
         else {
             this.elevators = new ArrayList<>();
-            this.floors = new ArrayList<>();
             this.times = new ArrayList<>();
         }
         this.passengerRatio = passengerRatio;
-        for (int i = 1; i <= numFloors; i++) {
-            floors.add(new Floor(structure, i));
-        }
+        this.numFloors = numFloors;
         for (int i=0; i < numElevators; i++) {
             Elevator elevator = new Elevator(this, capacity, numFloors);
             this.elevators.add(elevator);
@@ -32,7 +28,7 @@ public class ElevatorSimulation {
 
     public int randomFloor() {
         Random random = new Random();
-        return random.nextInt(1, floors.size());
+        return random.nextInt(1, numFloors);
     }
     public float randomFloat() {
         Random random = new Random();
@@ -43,24 +39,12 @@ public class ElevatorSimulation {
             if (randomFloat() < passengerRatio) {
                 int startFloor = randomFloor();
                 int destinationFloor = randomFloor();
-                floors.get(startFloor).generatePassenger(tick, destinationFloor);
+                Passenger passenger = new Passenger(tick, startFloor, destinationFloor);
                 Elevator closestElevator = findBestElevator(startFloor);
-                closestElevator.requestStop(startFloor);
+                closestElevator.requestStop(passenger);
             }
             for (Elevator elevator : elevators) {
-                //elevator.printInfo();
-                int currentFloor = elevator.getCurrentFloor();
-                System.out.println("Before -----------------------");
-                System.out.println("Elevator current floor: " + elevator.getCurrentFloor());
-                System.out.println("Elevator requests up before: " + elevator.requestedFloorsUp.size());
-                Queue<Passenger> floorQueue = floors.get(currentFloor).upQueue();
-                System.out.println("Current Floor Queue: " + floorQueue.size());
-                elevator.travel(tick, floorQueue);
-                System.out.println("After ---------------------");
-                System.out.println("Elevator current floor: " + elevator.getCurrentFloor());
-                System.out.println("Elevator requests up after: " + elevator.requestedFloorsUp.size());
-                System.out.println("Floor queue after: " + floorQueue.size());
-
+                elevator.travel(tick);
             }
         }
    }
@@ -68,17 +52,14 @@ public class ElevatorSimulation {
    public Elevator findBestElevator(int startFloor) {
         Elevator bestElevator = elevators.get(0);
         int minDistance = Math.abs(bestElevator.getCurrentFloor() - startFloor);
-
         for (Elevator elevator : elevators) {
             int distance = Math.abs(elevator.getCurrentFloor() - startFloor);
-
             if (elevator.goingUp() && startFloor < elevator.getCurrentFloor()) {
                 distance += startFloor - elevator.getCurrentFloor();
             }
             else if (!elevator.goingUp() && startFloor > elevator.getCurrentFloor()) {
                 distance += startFloor - elevator.getCurrentFloor();
             }
-
             if (distance < minDistance) {
                 minDistance = distance;
                 bestElevator = elevator;
@@ -103,7 +84,6 @@ public class ElevatorSimulation {
     public int getLongestTime() {
         return maxTime;
     }
-
     public int getAverageTime() {
         int sum = 0;
         for (Integer time : times) {
@@ -114,5 +94,4 @@ public class ElevatorSimulation {
         }
         return sum / times.size();
     }
-
 }

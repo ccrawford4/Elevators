@@ -1,6 +1,6 @@
-structures=array
-floors=30
-passengers=0.9
-elevators=1
-elevatorCapacity=15
-duration=450
+structures=linked
+floors=60
+passengers=0.1
+elevators=4
+elevatorCapacity=30
+duration=300
